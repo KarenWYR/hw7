@@ -1,0 +1,211 @@
+const Y_AXIS = 1;
+const X_AXIS = 2;
+let c1, c2;
+var ballX = 30;
+var ballY = 30;
+var ballSize = 20;
+var ballradius;
+
+//score
+var score = 0
+
+//thorn1
+var thornX = 400;
+var thornY = 0;
+var thornXSpeed = 10;
+var thornYSpeed = 20;
+
+//thorn2
+var thorn2X = 400;
+var thorn2Y = 0;
+var thorn2XSpeed = -3;
+var thorn2YSpeed = 35;
+
+var net2;
+var net2X = 0;
+var net2Y = 0;
+
+
+
+function preload() {
+  net2 = loadImage('net2.png');
+  pearl = loadImage('pearl.png');
+  youwin = loadImage('youwin.png');
+  soundFormats("wav");
+  getit = loadSound("getit.wav");
+  scream = loadSound("scream.wav");
+}
+
+
+
+function setup() {
+  createCanvas(1600, 550);
+
+  // Define colors
+  c1 = color(172, 229, 243);
+  c2 = color(0, 82, 122);
+
+  // noLoop();
+}
+
+
+
+function draw() {
+
+  // background
+  setGradient(0, 0, width, height, c1, c2, Y_AXIS);
+
+  //pearl
+  image(pearl, width - 200, height - 160, 200, 150);
+
+  //net2
+  noStroke();
+  // fill(249, 177, 192);
+  // ellipse(mouseX, mouseY, ballX, ballY);
+  // image(net2, mouseX - 25, mouseY - 20, 140, 135);
+  image(net2, net2X, net2Y, 140, 135);
+
+  //score
+  fill(255)
+  textSize(100);
+  text(score, width - 100, 100);
+
+  if (mouseIsPressed && dist(mouseX, mouseY, net2X, net2Y) < 100) {
+    net2X = mouseX - 25;
+    net2Y = mouseY - 20;
+  } else {
+    net2X = 0;
+    net2Y = 0;
+  }
+
+
+  //   thorn1
+  fill(84, 87, 88);
+  triangle(thornX, thornY, thornX + 30, thornY, thornX + 15, thornY + 100);
+
+  //   thorn2
+  fill(84, 87, 88);
+  triangle(thorn2X, thorn2Y, thorn2X + 30, thorn2Y, thorn2X + 15, thorn2Y + 100);
+
+  // //   pearl
+  // fill(232, 227, 210);
+  // ellipse(width - 50, height - 50, 50, 50);
+  // //   highlight
+  // fill(255);
+  // ellipse(width - 58, height - 58, 10, 10);
+
+  //youwin!!!
+  // image(youwin, 100, 100, 800, 350);
+
+
+
+
+  //   move thorn1
+  thornX = thornX + thornXSpeed;
+  thornY = thornY + thornYSpeed;
+
+  if (thornX < 140) {
+    thornX = random(140, width);
+    thornY = -100;
+  }
+
+  if (thornX > width) {
+    thornX = random(140, width);
+    thornY = -100;
+  }
+
+
+  if (thornY < -100) {
+    thornX = random(width);
+    thornY = -100;
+    // thornY = random(-100,height);
+  }
+
+  if (thornY > height) {
+    thornX = random(width);
+    thornY = -100;
+  }
+
+  //   move thorn2
+  thorn2X = thorn2X + thorn2XSpeed;
+  thorn2Y = thorn2Y + thorn2YSpeed;
+
+  if (thorn2X < 140) {
+    thorn2X = random(140, width);
+    thorn2Y = -100;
+  }
+
+  if (thorn2X > width) {
+    thorn2X = random(140, width);
+    thorn2Y = -100;
+  }
+
+
+  if (thorn2Y < -100) {
+    thorn2X = random(width);
+    thorn2Y = -100;
+    // thorn2Y = random(-100,height);
+  }
+
+  if (thorn2Y > height) {
+    thorn2X = random(width);
+    thorn2Y = -100;
+  }
+
+
+  //hit by thorn
+  if (dist(thornX + 15, thornY + 50, net2X + 50, net2Y + 50) < 50) {
+    net2X = 0;
+    net2Y = 0;
+    scream.play()
+  }
+
+  if (dist(thorn2X + 15, thorn2Y + 50, net2X + 50, net2Y + 50) < 50) {
+    net2X = 0;
+    net2Y = 0;
+    scream.play()
+
+  }
+  //get pearl
+  if (net2X > width - 170 && net2Y > height - 140) {
+    net2X = 0;
+    net2Y = 0;
+    getit.play();
+    score = score + 1
+  }
+
+  if (score > 4) {
+    thornXSpeed = 0;
+    thornYSpeed = 0;
+    thorn2XSpeed = 0;
+    thorn2YSpeed = 0;
+    // score = 0
+    image(youwin, 100, 100, 800, 350);
+  }
+
+  if (dist(mouseX, mouseY, 375, 425) < 100) {
+    if (mouseIsPressed) {
+      score = 0;
+      thornXSpeed = 10;
+      thornYSpeed = 20;
+      thorn2XSpeed = -3;
+      thorn2YSpeed = 35;
+    }
+
+  }
+}
+
+
+function setGradient(x, y, w, h, c1, c2, axis) {
+  noFill();
+
+  if (axis === Y_AXIS) {
+    // Top to bottom gradient
+    for (let i = y; i <= y + h; i++) {
+      let inter = map(i, y, y + h, 0, 1);
+      let c = lerpColor(c1, c2, inter);
+      stroke(c);
+      line(x, i, x + w, i);
+    }
+  }
+}
